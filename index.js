@@ -6,12 +6,14 @@ const PORT = 4000
 const userRoutes = require("./routes/user.routes")
 const {connectDB} = require("./db")
 const taskRoutes = require("./routes/task.routes")
+const { hash, verifyHash } = require("./utils/auth");
 
+app.use(express.json())
 
 app.use("/users", userRoutes)
-app.use("/users/tasks", taskRoutes)
-app.get("/", (req, res)=> {
-    res.status(200).json({message: "Welcome"})
+app.use("/tasks", taskRoutes)
+app.get("/", async (req, res)=> {
+    res.json({ Message: "Welcome" });
 })
 
 app.listen(PORT,()=>

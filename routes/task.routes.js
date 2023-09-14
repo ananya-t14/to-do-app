@@ -1,19 +1,35 @@
 const express = require('express');
 const router = express.Router();
-const taskModel = require('../models/task.model');
+const taskModel = require('../models/task.models');
+const userModel = require('../models/user.models');  
 
-router.post('/', async (req, res) => {
+function createPayload(data) {
+  return {
+    title : data.title,
+    description: data.description,
+    createdBy: data.email,
+    completed: data.status,
+  }
+}
+
+router.post('/newTask', async (req, res) => {
   try {
-    const newTask = await taskModel.create(req.body);
+    console.log(req.body);
+    const { email, title, description, status } = req.body;
+    if (!email || !title || !description || !status) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }     
+    const newTask = await taskModel.create(createPayload(req.body));
     res.status(201).json(newTask);
-  } catch (error) {
+  } 
+  catch (error) {
     res.status(500).json({ error: 'Error creating task' });
   }
 });
 
-router.get('/', async (req, res) => {
+router.get('/:email', async (req, res) => {
   try {
-    const tasks = await taskModel.find();
+    const tasks = await taskModel.find({});
     res.json(tasks);
   } catch (error) {
     res.status(500).json({ error: 'Error fetching tasks' });
