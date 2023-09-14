@@ -7,16 +7,15 @@ function createPayload(data) {
   return {
     title : data.title,
     description: data.description,
-    createdBy: data.email,
+    createdBy: data.username,
     completed: data.status,
   }
 }
 
 router.post('/newTask', async (req, res) => {
   try {
-    console.log(req.body);
-    const { email, title, description, status } = req.body;
-    if (!email || !title || !description || !status) {
+    const { username, title, description, status } = req.body;
+    if (!username || !title || !description || !status) {
       return res.status(400).json({ error: 'Missing required fields' });
     }     
     const newTask = await taskModel.create(createPayload(req.body));
@@ -27,51 +26,67 @@ router.post('/newTask', async (req, res) => {
   }
 });
 
-router.get('/:email', async (req, res) => {
+router.get('/:username/all', async (req, res) => {
   try {
-    const tasks = await taskModel.find({});
+    const username  = req.params.username;
+    const user = await findOne({ username });
+    if (!user) { 
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const tasks = await taskModel.find({ user : username });
     res.json(tasks);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching tasks' });
+  } 
+  catch (error) {
+    res.status(500).json({ error: 'Server Error' });
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:username/:title', async (req, res) => {
   try {
-    const task = await taskModel.findById(req.params.id);
+    const username  = req.params.username;
+    const user = await findOne({ username });
+    if (!user) { 
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const task = await taskModel.findOne({ user : username, title : req.params.title});
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
     }
     res.json(task);
-  } catch (error) {
+  } 
+  catch (error) {
     res.status(500).json({ error: 'Error fetching task' });
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:username/:title', async (req, res) => {
   try {
-    const updatedTask = await taskModel.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!updatedTask) {
-      return res.status(404).json({ error: 'Task not found' });
+    const username  = req.params.username;
+    const user = await findOne({ username });
+    if (!user) { 
+      return res.status(404).json({ error: 'User not found' });
     }
-    res.json(updatedTask);
+    const task = await taskModel.findOne({ user : username, title : req.params.title});
+    const updatedData = req.body
+    const updatedDocument = await taskModel.findOneAndUpdate({ username, title }, updatedData, {new: true})
+    if (!updatedDocument) {
+        return res.status(404).json({ error: 'User not found' });
+    }
+    res.status(200).json(updatedDocument);
   } catch (error) {
     res.status(500).json({ error: 'Error updating task' });
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:username/:title', async (req, res) => {
   try {
-    const deletedTask = await taskModel.findByIdAndRemove(req.params.id);
+    const deletedTask = await taskModel.findOneAndDelete({ username, title });
     if (!deletedTask) {
       return res.status(404).json({ error: 'Task not found' });
     }
     res.json(deletedTask);
-  } catch (error) {
+  } 
+  catch (error) {
     res.status(500).json({ error: 'Error deleting task' });
   }
 });

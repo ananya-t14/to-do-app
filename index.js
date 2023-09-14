@@ -9,9 +9,9 @@ const taskRoutes = require("./routes/task.routes")
 const { hash, verifyHash } = require("./utils/auth");
 
 app.use(express.json())
-
 app.use("/users", userRoutes)
 app.use("/tasks", taskRoutes)
+
 app.get("/", async (req, res)=> {
     res.json({ Message: "Welcome" });
 })
