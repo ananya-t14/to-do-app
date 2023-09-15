@@ -9,8 +9,8 @@ function createPayload(data) {
     description: data.description,
     createdBy: data.username,
     completed: data.status,
-  }
-}
+  };
+};
 
 router.post('/newTask', async (req, res) => {
   try {
@@ -29,11 +29,14 @@ router.post('/newTask', async (req, res) => {
 router.get('/:username/all', async (req, res) => {
   try {
     const username  = req.params.username;
-    const user = await findOne({ username });
+    const user = await userModel.findOne({ username });
     if (!user) { 
       return res.status(404).json({ error: 'User not found' });
     }
-    const tasks = await taskModel.find({ user : username });
+    const tasks = await taskModel.find({ createdBy : username });
+    if (!tasks) {
+      return res.status(404).json({ message: 'Add more tasks' });
+    }
     res.json(tasks);
   } 
   catch (error) {
@@ -44,13 +47,13 @@ router.get('/:username/all', async (req, res) => {
 router.get('/:username/:title', async (req, res) => {
   try {
     const username  = req.params.username;
-    const user = await findOne({ username });
+    const user = await userModel.findOne({ username });
     if (!user) { 
       return res.status(404).json({ error: 'User not found' });
     }
-    const task = await taskModel.findOne({ user : username, title : req.params.title});
+    const task = await taskModel.findOne({ createdBy : username, title : req.params.title});
     if (!task) {
-      return res.status(404).json({ error: 'Task not found' });
+      return res.status(404).json({ error: 'Task does not exist' });
     }
     res.json(task);
   } 
@@ -62,31 +65,39 @@ router.get('/:username/:title', async (req, res) => {
 router.put('/:username/:title', async (req, res) => {
   try {
     const username  = req.params.username;
-    const user = await findOne({ username });
+    const user = await userModel.findOne({ username });
     if (!user) { 
       return res.status(404).json({ error: 'User not found' });
     }
-    const task = await taskModel.findOne({ user : username, title : req.params.title});
+    const task = await taskModel.findOne({ createdBy : username, title : req.params.title});
     const updatedData = req.body
-    const updatedDocument = await taskModel.findOneAndUpdate({ username, title }, updatedData, {new: true})
+    const updatedDocument = await taskModel.findOneAndUpdate({ createdBy : username, title : req.params.title }, updatedData, {new: true});
     if (!updatedDocument) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'Task does not exist' });
     }
     res.status(200).json(updatedDocument);
-  } catch (error) {
+  } 
+  catch (error) {
     res.status(500).json({ error: 'Error updating task' });
   }
 });
 
 router.delete('/:username/:title', async (req, res) => {
   try {
-    const deletedTask = await taskModel.findOneAndDelete({ username, title });
+    const username  = req.params.username;
+    const user = await userModel.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' }); 
+    }
+    const deletedTask = await taskModel.findOne({ createdBy : username, title : req.params.title });
     if (!deletedTask) {
       return res.status(404).json({ error: 'Task not found' });
     }
-    res.json(deletedTask);
+    await taskModel.findOneAndDelete({ title : req.params.title });
+    res.status(200).json({ message: 'Task deleted successfully' });
   } 
   catch (error) {
+    console.log(error)
     res.status(500).json({ error: 'Error deleting task' });
   }
 });
