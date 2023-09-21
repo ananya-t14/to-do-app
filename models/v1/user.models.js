@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true,
+        // unique: true,
     },
     name: {
         type: String,
@@ -26,6 +26,8 @@ const userSchema = new mongoose.Schema({
         default: Date.now,
     },
 });
+
+userSchema.index({ username: 1 }, { unique: true, name: 'user_name_index' });
 
 const User = mongoose.model('User', userSchema);
 

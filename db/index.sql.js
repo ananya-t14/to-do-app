@@ -1,11 +1,9 @@
 const { Sequelize } = require("sequelize");
 const dbConfig = require("./sql.config");
-// import dbConfig from '../config/db.config';
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
-
   pool: {
     max: dbConfig.pool.max,
     min: dbConfig.pool.min,
