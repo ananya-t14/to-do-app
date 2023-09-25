@@ -1,4 +1,4 @@
-import { userSchema, taskSchema } from "./schema";
+const { userSchema, taskSchema } = require("./schema");
 
 class Validators {
   static async validateUser(req, res, next) {
