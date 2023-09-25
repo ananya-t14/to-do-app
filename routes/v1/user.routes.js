@@ -1,8 +1,9 @@
 const { Router } = require("express");
 const router = Router();
 const UserController = require("../../controllers/v1/user-controller");
+const Validators = require("../../middlewares/validators");
 
-router.post("/signup", UserController.addUser);
+router.post("/signup", Validators.validateUser, UserController.addUser);
 
 router.get("/:username", UserController.getUser);
 
