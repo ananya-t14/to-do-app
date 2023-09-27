@@ -1,7 +1,7 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("../../db/sql");
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../../db/sql.config');
 
-const Task = sequelize.define("Task", {
+const Task = sequelize.define('Task', {
   title: {
     type: DataTypes.STRING,
     allowNull: false,

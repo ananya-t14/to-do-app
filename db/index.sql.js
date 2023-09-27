@@ -1,5 +1,5 @@
-const { Sequelize } = require("sequelize");
-const dbConfig = require("./sql.config");
+const { Sequelize } = require('sequelize');
+const dbConfig = require('./sql.config');
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
@@ -15,11 +15,14 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 async function connectPostgres() {
   try {
     await sequelize.authenticate();
-    console.log("Connection to Postgres DB has been established successfully.");
+    // eslint-disable-next-line no-console
+    console.log('Connection to Postgres DB has been established successfully.');
     await sequelize.sync({ force: false });
-    console.log("Postgres database synced ");
+    // eslint-disable-next-line no-console
+    console.log('Postgres database synced ');
   } catch (error) {
-    console.log("Error in connecting to Postgres DB " + error);
+    // eslint-disable-next-line no-console
+    console.log(`Error in connecting to Postgres DB ${error}`);
   }
 }
 

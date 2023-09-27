@@ -1,19 +1,21 @@
-const bcrypt = require("bcryptjs");
+const bcrypt = require('bcryptjs');
 
 function Response(statusCode, message, data = null) {
-    return { statusCode, message, data };
+  return { statusCode, message, data };
 }
-  
+
 async function hash(value) {
-    return await bcrypt.hash(value, 12);
+  return bcrypt.hash(value, 12);
 }
 
 async function authenticate(hashed) {
-    return await bcrypt.compare(process.env.TOKEN, hashed);
-}
-  
-async function verifyHash(plain, hashed) {
-    return await bcrypt.compare(plain, hashed);
+  return bcrypt.compare(process.env.TOKEN, hashed);
 }
 
-module.exports = {authenticate, Response, hash, verifyHash}
+async function verifyHash(plain, hashed) {
+  return bcrypt.compare(plain, hashed);
+}
+
+module.exports = {
+  authenticate, Response, hash, verifyHash,
+};
