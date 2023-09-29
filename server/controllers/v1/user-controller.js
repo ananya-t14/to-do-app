@@ -1,5 +1,5 @@
 const userModel = require('../../models/v1/user.models');
-const { hash } = require('../../utils/auth');
+const { hash, verifyHash, generateToken } = require('../../utils/auth');
 
 class UserController {
   static async addUser(req, res) {
@@ -21,7 +21,29 @@ class UserController {
         password: hashedpassword,
         email,
       });
-      return res.status(200).json({ message: `Created user having ${email}` });
+      const accessToken = await generateToken({ email, username });
+      return res.status(200).json({ message: `Created user having ${email}`, email, accessToken });
+    } catch (e) {
+      return res.status(500).json({ message: 'Server Error' });
+    }
+  }
+
+  static async login(req, res) {
+    try {
+      const { username, password } = req.body;
+      if (!username || !password) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+      const user = await userModel.findOne({ username });
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      const isMatch = await verifyHash(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+      const accessToken = await generateToken({ username, email: user.email });
+      return res.status(200).json({ message: 'Login successful', accessToken, expiresIn: '5d' });
     } catch (e) {
       return res.status(500).json({ message: 'Server Error' });
     }
