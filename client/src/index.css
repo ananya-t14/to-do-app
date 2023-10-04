@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins&family=Roboto&display=swap');
+
+body {
+    background: linear-gradient(90deg, #1A2980 0%, #26D0CE 100%);
+}

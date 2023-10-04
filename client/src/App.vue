@@ -1,26 +1,29 @@
-<template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
-</template>
+<script setup>
+import { ref, computed } from 'vue'
+import Login from './components/login/LoginPage.vue'
+import SignUp from './components/signup/SignUp.vue'
+// import NotFound from './NotFound.vue'
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
+const routes = {
+  '/': Login,
+  '/signup': SignUp
 }
+
+const currentPath = ref(window.location.pathname)
+
+window.addEventListener('popstate', () => {
+  console.log(window.location.pathname)
+  currentPath.value = window.location.pathname
+})
+
+const currentView = computed(() => {
+  return routes[currentPath.value || '/']
+})
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+<template>
+  <!-- <a href="/">Login</a> |
+  <a href="/signup">Signup</a> | -->
+  <!-- <a href="#/non-existent-path">Broken Link</a> -->
+  <component :is="currentView" class="bg-[url('../public/images/bgvector.svg')]"/>
+</template>

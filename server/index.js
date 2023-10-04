@@ -5,6 +5,7 @@ const express = require('express');
 
 const app = express();
 const PORT = 4000;
+const cors = require('cors')
 const { connectDB } = require('./db/index.mongo');
 const userRoutes = require('./routes/v1/user.routes');
 const taskRoutes = require('./routes/v1/task.routes');
@@ -12,7 +13,7 @@ const taskRoutes = require('./routes/v1/task.routes');
 // const userRoutesV2 = require("./routes/v2/user.routes");
 // const taskRoutesV2 = require("./routes/v2/task.routes");
 // const { hash, verifyHash } = require('./utils/auth');
-
+app.use(cors())
 app.use(express.json());
 app.use('/users', userRoutes);
 app.use('/tasks', taskRoutes);
